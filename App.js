@@ -1,35 +1,88 @@
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View, SafeAreaView, StatusBar } from "react-native";
-import { Searchbar } from "react-native-paper";
+import { Text } from "react-native";
+import { ThemeProvider } from "styled-components/native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import { SafeArea } from "./src/components/utilities/safe-area.component";
+import { theme } from "./src/infrastructure/theme";
+import { RestaurantsScreen } from "./src/features/restaurants/screens/restaurants.screen";
+
+import {
+    useFonts as useOswald,
+    Oswald_400Regular,
+} from "@expo-google-fonts/oswald";
+import { useFonts as useLato, Lato_400Regular } from "@expo-google-fonts/lato";
+
+import { restaurantsRequest } from "./src/services/restaurants/restaurants.service";
+
+const Tab = createBottomTabNavigator();
+
+const TAB_ICON = {
+    Restaurants: "md-restaurant",
+    Map: "md-map",
+    Settings: "md-settings",
+};
+
+const Settings = () => (
+    <SafeArea>
+        <Text>Settings</Text>
+    </SafeArea>
+);
+const Map = () => (
+    <SafeArea>
+        <Text>Map</Text>
+    </SafeArea>
+);
+
+const createScreenOptions = ({ route }) => {
+    const iconName = TAB_ICON[route.name];
+    return {
+        tabBarIcon: ({ size, color }) => (
+            <Ionicons name={iconName} size={size} color={color} />
+        ),
+    };
+};
 
 export default function App() {
+    const [oswaldLoaded] = useOswald({
+        Oswald_400Regular,
+    });
+
+    const [latoLoaded] = useLato({
+        Lato_400Regular,
+    });
+
+    if (!oswaldLoaded || !latoLoaded) {
+        return null;
+    }
+
     return (
         <>
-            <SafeAreaView style={styles.container}>
-                <View style={styles.search}>
-                    <Searchbar />
-                </View>
-                <View style={styles.list}>
-                    <Text>List</Text>
-                </View>
-            </SafeAreaView>
-            <ExpoStatusBar style="auto" />
+            <ThemeProvider theme={theme}>
+                <NavigationContainer>
+                    <Tab.Navigator
+                        screenOptions={createScreenOptions}
+                        tabBarOptions={{
+                            activeTintColor: "tomato",
+                            inactiveTintColor: "gray",
+                        }}
+                    >
+                        <Tab.Screen
+                            name="Restaurants"
+                            component={RestaurantsScreen}
+                        />
+                        <Tab.Screen name="Settings" component={Settings} />
+                        <Tab.Screen name="Map" component={Map} />
+                    </Tab.Navigator>
+                </NavigationContainer>
+                <ExpoStatusBar
+                    style="auto"
+                    backgroundColor={theme.colors.ui.secondary}
+                />
+            </ThemeProvider>
         </>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        marginTop: StatusBar.currentHeight,
-    },
-    search: {
-        padding: 16,
-    },
-    list: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: "blue",
-    },
-});
