@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
-import { View, FlatList } from "react-native";
-import { Searchbar } from "react-native-paper";
+import { View, FlatList, Pressable } from "react-native";
 import { RestaurantInfoCard } from "../components/restaurant-info-card.component";
 import { SafeArea } from "../../../components/utilities/safe-area.component";
 import styled from "styled-components/native";
 import { ActivityIndicator, Colors } from "react-native-paper";
 
 import { RestaurantsContext } from "../../../services/restaurants/restaurants.context";
+import { FavouritesContext } from "../../../services/favourites/favourites.context";
 
 import { Search } from "../components/search.component";
 
@@ -26,8 +26,9 @@ const LoadingContainer = styled(View)`
     left: 50%;
 `;
 
-export const RestaurantsScreen = () => {
+export const RestaurantsScreen = ({ navigation }) => {
     const { restaurants, isLoading, isError } = useContext(RestaurantsContext);
+    //const { favourites } = useContext(FavouritesContext);
 
     return (
         <SafeArea>
@@ -40,7 +41,17 @@ export const RestaurantsScreen = () => {
                 <RestaurantList
                     data={restaurants}
                     renderItem={({ item }) => {
-                        return <RestaurantInfoCard restaurant={item} />;
+                        return (
+                            <Pressable
+                                onPress={() =>
+                                    navigation.navigate("RestaurantDetail", {
+                                        restaurant: item,
+                                    })
+                                }
+                            >
+                                <RestaurantInfoCard restaurant={item} />
+                            </Pressable>
+                        );
                     }}
                     keyExtractor={(item) => item.name}
                 />

@@ -13,8 +13,8 @@ export const Search = () => {
     const [searchKeyword, setSearchKeyword] = useState(keyword);
 
     useEffect(() => {
-        search(searchKeyword);
-    }, []);
+        setSearchKeyword(keyword);
+    }, [keyword]);
 
     return (
         <SearchContainer>
