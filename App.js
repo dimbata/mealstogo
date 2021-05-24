@@ -1,6 +1,7 @@
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ThemeProvider } from "styled-components/native";
+import * as firebase from "firebase";
 
 import { theme } from "./src/infrastructure/theme";
 
@@ -10,10 +11,20 @@ import {
 } from "@expo-google-fonts/oswald";
 import { useFonts as useLato, Lato_400Regular } from "@expo-google-fonts/lato";
 
-import { RestaurantsContextProvider } from "./src/services/restaurants/restaurants.context";
-import { LocationContextProvider } from "./src/services/location/location.context";
-import { FavouritesContextProvider } from "./src/services/favourites/favourites.context";
 import { Navigation } from "./src/infrastructure/navigation";
+import { AuthenticationContextProvider } from "./src/services/authentication/authentication.context";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAv6aSckZ-3M3xhvIgTRE-Q0qnkA5fhkco",
+    authDomain: "mealstogo-3aa0d.firebaseapp.com",
+    projectId: "mealstogo-3aa0d",
+    storageBucket: "mealstogo-3aa0d.appspot.com",
+    messagingSenderId: "771889417911",
+    appId: "1:771889417911:web:4f2a0ad8701200bc818732",
+};
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
 export default function App() {
     const [oswaldLoaded] = useOswald({
@@ -27,19 +38,14 @@ export default function App() {
     if (!oswaldLoaded || !latoLoaded) {
         return null;
     }
-
     return (
         <>
             <ThemeProvider theme={theme}>
-                <FavouritesContextProvider>
-                    <LocationContextProvider>
-                        <RestaurantsContextProvider>
-                            <Navigation />
-                        </RestaurantsContextProvider>
-                    </LocationContextProvider>
-                </FavouritesContextProvider>
+                <AuthenticationContextProvider>
+                    <Navigation />
+                </AuthenticationContextProvider>
             </ThemeProvider>
-            <ExpoStatusBar style="inverted" backgroundColor="red" />
+            <ExpoStatusBar style="auto" />
         </>
     );
 }
