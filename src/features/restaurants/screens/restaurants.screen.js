@@ -14,6 +14,7 @@ import { Search } from "../components/search.component";
 
 import { RestaurantList } from "../components/restaurant-list.styles";
 import { FadeInView } from "../../../components/animations/fade.animation";
+import { LocationContext } from "../../../services/location/location.context";
 
 const Loading = styled(ActivityIndicator)`
     margin-left: -25px;
@@ -26,8 +27,9 @@ const LoadingContainer = styled(View)`
 `;
 
 export const RestaurantsScreen = ({ navigation }) => {
-    const { restaurants, isLoading, isError } = useContext(RestaurantsContext);
+    const { restaurants, isLoading, error } = useContext(RestaurantsContext);
     const { favourites } = useContext(FavouritesContext);
+    const { error: locationError } = useContext(LocationContext);
     const [isToggled, setIsToggled] = useState(false);
 
     return (
@@ -64,7 +66,9 @@ export const RestaurantsScreen = ({ navigation }) => {
                             </Pressable>
                         );
                     }}
-                    keyExtractor={(item) => item.name}
+                    keyExtractor={(item) => {
+                        return item.reference;
+                    }}
                 />
             )}
         </SafeArea>

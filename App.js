@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { ThemeProvider } from "styled-components/native";
 import * as firebase from "firebase";
 
+require("firebase/functions");
+
 import { theme } from "./src/infrastructure/theme";
 
 import {

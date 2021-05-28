@@ -1,5 +1,5 @@
-import { mockImages, mocks } from "./mock";
 import camelize from "camelize";
+import { host, isMock } from "../../utils/env";
 
 // export const restaurantsRequest = (location = "37.7749295,-122.4194155") => {
 //     return new Promise((resolve, reject) => {
@@ -21,10 +21,6 @@ import camelize from "camelize";
 
 export const restaurantsTransform = ({ results = [] }) => {
     const mappedResults = results.map((restaurant) => {
-        restaurant.photos = restaurant.photos.map((photo) => {
-            return mockImages[Math.ceil(Math.random() * mockImages.length - 1)];
-        });
-
         return {
             ...restaurant,
             address: restaurant.vicinity,
@@ -39,14 +35,12 @@ export const restaurantsTransform = ({ results = [] }) => {
 };
 
 export const restaurantsRequest = async (location) => {
-    const result = await mocks[location];
-
-    if (!result) {
-        throw new Error("BRUH");
-    }
-    return result;
+    console.log(location);
+    return fetch(
+        `https://us-central1-mealstogo-3aa0d.cloudfunctions.net/placesNearby?location=${location}&mock=${isMock}`
+    ).then((res) => {
+        //const response = res.json();
+        //console.log(response);
+        return res.json();
+    });
 };
-
-restaurantsRequest("37.7749295,-122.4194155", (response) => {
-    //console.log(restaurantsTransform(response));
-});

@@ -1,16 +1,11 @@
-import React, {
-    useState,
-    createContext,
-    useEffect,
-    useMemo,
-    useContext,
-} from "react";
-import { LocationContext } from "../location/location.context";
+import React, { useState, useContext, createContext, useEffect } from "react";
 
 import {
     restaurantsRequest,
     restaurantsTransform,
 } from "./restaurants.service";
+
+import { LocationContext } from "../location/location.context";
 
 export const RestaurantsContext = createContext();
 
@@ -18,27 +13,23 @@ export const RestaurantsContextProvider = ({ children }) => {
     const [restaurants, setRestaurants] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-
     const { location } = useContext(LocationContext);
 
     const retrieveRestaurants = (loc) => {
         setIsLoading(true);
         setRestaurants([]);
-        setTimeout(() => {
-            try {
-                restaurantsRequest(loc)
-                    .then((results) => restaurantsTransform(results))
-                    .then((results) => {
-                        setIsLoading(false);
-                        setRestaurants(results);
-                    });
-            } catch (err) {
-                setIsLoading(false);
-                console.error(err);
-            }
-        }, 1000);
-    };
 
+        restaurantsRequest(loc)
+            .then(restaurantsTransform)
+            .then((results) => {
+                setIsLoading(false);
+                setRestaurants(results);
+            })
+            .catch((err) => {
+                setIsLoading(false);
+                setError(err);
+            });
+    };
     useEffect(() => {
         if (location) {
             const locationString = `${location.lat},${location.lng}`;
@@ -47,7 +38,13 @@ export const RestaurantsContextProvider = ({ children }) => {
     }, [location]);
 
     return (
-        <RestaurantsContext.Provider value={{ restaurants, isLoading, error }}>
+        <RestaurantsContext.Provider
+            value={{
+                restaurants,
+                isLoading,
+                error,
+            }}
+        >
             {children}
         </RestaurantsContext.Provider>
     );
